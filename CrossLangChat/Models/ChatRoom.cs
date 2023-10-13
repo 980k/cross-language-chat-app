@@ -23,6 +23,7 @@ namespace CrossLangChat.Models
             Participants = new List<User>(participants);
         }
         
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id {get; set;}
 

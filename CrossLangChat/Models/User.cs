@@ -19,6 +19,7 @@ namespace CrossLangChat.Models
             ChatRooms = new List<ChatRoom>();
         }
 
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
@@ -32,7 +33,6 @@ namespace CrossLangChat.Models
         [RegularExpression("^[a-zA-Z0-9]*$", ErrorMessage = "Password contains invalid characters")]
         public string Password { get; set; }
 
-        // Represents the IDs of the chat rooms associated with the user
         public ICollection<ChatRoom> ChatRooms { get; set; }
     }
 }

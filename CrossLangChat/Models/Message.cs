@@ -12,16 +12,17 @@ namespace CrossLangChat.Models
             this.ChatRoom = ChatRoom;
         }
 
+        [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id {get; set;}
 
         [Required]
         public string ? Content {get; set;}
 
-        [Required]
+        public int SenderId { get; set; }
         public User Sender { get; set; }
 
-        [Required]
-        public ChatRoom ChatRoom {get; set; }
+        public int ChatRoomId { get; set; }
+        public ChatRoom ChatRoom { get; set; }
     }
 }
