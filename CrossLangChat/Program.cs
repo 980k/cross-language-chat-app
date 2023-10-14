@@ -1,4 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using CrossLangChat.Models;
+using CrossLangChat.Data;
+
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<CrossLangChatContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("CrossLangChatContext") ?? throw new InvalidOperationException("Connection string 'CrossLangChatContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
