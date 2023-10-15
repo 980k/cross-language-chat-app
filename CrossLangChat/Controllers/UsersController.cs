@@ -159,5 +159,24 @@ namespace CrossLangChat.Controllers
         {
           return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+
+
+        // Custom Routes
+
+        // POST: api/user/{userId}/chatroom
+        [HttpPost("{userId}/chatroom")]
+        public async Task<IActionResult> AddChatRoomToUser(int userId, [FromBody] ChatRoom chatRoom) {
+            var user = await _context.User.FindAsync(userId);
+
+            if (user == null) 
+            {
+                return NotFound("User not found");
+            }
+
+            user.ChatRooms.Add(chatRoom);
+            await _context.SaveChangesAsync();
+
+            return Ok("ChatRoom added to the user's ChatRooms");
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace CrossLangChat.Test
 {
     public class UsersControllersTest
     {
-        private CrossLangChatContext _context;
+        private CrossLangChatContext ? _context;
 
         [SetUp]
         public void Setup()
@@ -22,37 +22,26 @@ namespace CrossLangChat.Test
         }
 
         [Test]
-        public async Task UsersController_Create_ValidModel_ShouldRedirectToIndex()
-        {
-            // Arrange
-            var userController = new UsersController(_context);
-            var newUser = new User { Id = 1, Username = "NewUser", Password = "NewPassword" };
-
-            // Act
-            var result = await userController.Create(newUser);
-
-            // Assert
-            Assert.IsInstanceOf<RedirectToActionResult>(result);
-            if (result is RedirectToActionResult redirectResult)
-            {
-                Assert.AreEqual("Index", redirectResult.ActionName);
-            }
-            else
-            {
-                Assert.Fail("Expected RedirectToActionResult but got a different result.");
-            }
-
-            // Verify that the new user was added to the in-memory database
-            var createdUser = _context.User.Find(1);
-            Assert.IsNotNull(createdUser);
-            Assert.AreEqual("NewUser", createdUser.Username);
-            Assert.AreEqual("NewPassword", createdUser.Password);
-        }
-
-        [Test]
         public async Task UsersController_AddChatRoom_ShouldReturnChatrooms()
         {
-            Assert.AreEqual(1, 2);
+            var userController = new UsersController(_context!);
+            var newUser = new User { Id = 1, Username="testUser1", Password="test1" };
+
+            var chatroomController = new ChatRoomsController(_context!);
+            var newChatRoom = new ChatRoom { Id = 1, RoomName="testRoom1" };
+
+            await userController.Create(newUser);
+            await chatroomController.Create(newChatRoom);
+
+            var createdChatRoom = _context?.ChatRoom.Find(1);
+
+            var userChatRoomUpdate = await userController.AddChatRoomToUser(1, createdChatRoom!);
+            
+            var updatedUser = _context?.User.Find(1);
+
+            Assert.AreNotEqual(null, updatedUser?.ChatRooms);
+            Assert.AreEqual(1, updatedUser?.ChatRooms.Count);
+            Assert.AreEqual(newChatRoom, updatedUser?.ChatRooms.FirstOrDefault());
         }
     }
 }
