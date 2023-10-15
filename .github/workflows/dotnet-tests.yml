@@ -12,15 +12,15 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up .NET Core
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 5.0
+        dotnet-version: 7.0.x
 
     - name: Restore dependencies
-      run: dotnet restore CrossLangChat/CrossLangChat.csproj  # Path to your main app project file
+      run: dotnet restore CrossLangChat/CrossLangChat.csproj
 
     - name: Build and test
-      run: dotnet test CrossLangChat.Test/CrossLangChat.Test.csproj  # Path to your test project file
+      run: dotnet test CrossLangChat.Test/CrossLangChat.Test.csproj
