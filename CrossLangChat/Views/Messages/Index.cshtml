@@ -16,6 +16,9 @@
                 @Html.DisplayNameFor(model => model.Content)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Timestamp)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Sender)
             </th>
             <th>
@@ -29,6 +32,9 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timestamp)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Sender.Password)

@@ -59,7 +59,7 @@ namespace CrossLangChat.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Content,SenderId,ChatRoomId")] Message message)
+        public async Task<IActionResult> Create([Bind("Id,Content,Timestamp,SenderId,ChatRoomId")] Message message)
         {
             if (ModelState.IsValid)
             {
@@ -95,7 +95,7 @@ namespace CrossLangChat.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,SenderId,ChatRoomId")] Message message)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,Timestamp,SenderId,ChatRoomId")] Message message)
         {
             if (id != message.Id)
             {

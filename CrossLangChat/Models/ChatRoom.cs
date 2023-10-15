@@ -9,15 +9,13 @@ namespace CrossLangChat.Models
     {        
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id {get; set;}
+        public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Room name is required.")]
         public string ? RoomName { get; set; }
 
-         // Navigation property representing the users participating in this chatroom
-        public ICollection<User> ? Participants { get; set; }
+        public ICollection<User> ? Participants { get; set; } = new List<User>();
 
-        // Navigation property representing the messages sent in this chatroom
-        public ICollection<Message> ? Messages { get; set; }
+        public ICollection<Message> ? Messages { get; set; } = new List<Message>();
     }
 }
