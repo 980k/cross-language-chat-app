@@ -11,7 +11,7 @@ namespace CrossLangChat.Models
         public int Id { get; set; }
 
         [Required]
-        public string? Content { get; set; }
+        public string ? Content { get; set; }
 
         [DataType(DataType.DateTime)]
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
@@ -19,10 +19,10 @@ namespace CrossLangChat.Models
 
         [ForeignKey("SenderId")]
         public int SenderId { get; set; }
-        public User? Sender { get; set; }
+        public User ? Sender { get; set; }
 
         [ForeignKey("ChatRoomId")]
         public int ChatRoomId { get; set; }
-        public ChatRoom? ChatRoom { get; set; }
+        public ChatRoom ? ChatRoom { get; set; }
     }
 }

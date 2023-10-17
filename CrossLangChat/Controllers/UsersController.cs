@@ -56,7 +56,7 @@ namespace CrossLangChat.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,Password")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Username,Password,Language")] User user)
         {
             if (ModelState.IsValid)
             {
@@ -88,7 +88,7 @@ namespace CrossLangChat.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,Password,Language")] User user)
         {
             if (id != user.Id)
             {
@@ -158,25 +158,6 @@ namespace CrossLangChat.Controllers
         private bool UserExists(int id)
         {
           return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-
-        // Custom Routes
-
-        // POST: api/user/{userId}/chatroom
-        [HttpPost("{userId}/chatroom")]
-        public async Task<IActionResult> AddChatRoomToUser(int userId, [FromBody] ChatRoom chatRoom) {
-            var user = await _context.User.FindAsync(userId);
-
-            if (user == null) 
-            {
-                return NotFound("User not found");
-            }
-
-            user.ChatRooms.Add(chatRoom);
-            await _context.SaveChangesAsync();
-
-            return Ok("ChatRoom added to the user's ChatRooms");
         }
     }
 }

@@ -14,7 +14,7 @@ namespace CrossLangChat.Models
         [Required(ErrorMessage = "Room name is required.")]
         public string ? RoomName { get; set; }
 
-        public ICollection<User> ? Participants { get; set; } = new List<User>();
+        public ICollection<User> ? Users { get; set; } = new List<User>();
 
         public ICollection<Message> ? Messages { get; set; } = new List<Message>();
     }

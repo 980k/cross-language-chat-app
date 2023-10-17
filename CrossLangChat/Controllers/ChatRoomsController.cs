@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CrossLangChat.Data;
 using CrossLangChat.Models;
+using NuGet.Versioning;
 
 namespace CrossLangChat.Controllers
 {
@@ -136,23 +137,113 @@ namespace CrossLangChat.Controllers
             return View(chatRoom);
         }
 
-        // POST: ChatRooms/Delete/5
+        // // POST: ChatRooms/Delete/5
+        // [HttpPost, ActionName("Delete")]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> DeleteConfirmed(int id)
+        // {
+        //     if (_context.ChatRoom == null)
+        //     {
+        //         return Problem("Entity set 'CrossLangChatContext.ChatRoom'  is null.");
+        //     }
+        //     var chatRoom = await _context.ChatRoom.FindAsync(id);
+        //     if (chatRoom != null)
+        //     {
+        //         _context.ChatRoom.Remove(chatRoom);
+        //     }
+            
+        //     await _context.SaveChangesAsync();
+        //     return RedirectToAction(nameof(Index));
+        // }
+
+
+        //         public async Task<IActionResult> Create([Bind("Id,RoomName")] ChatRoom chatRoom)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         _context.Add(chatRoom);
+        //         await _context.SaveChangesAsync();
+        //         return RedirectToAction(nameof(Index));
+        //     }
+        //     return View(chatRoom);
+        // }
+
+
+        /*
+        ***
+        CUSTOM ROUTES
+        ***
+        */
+
+        // POST: ChatRooms/User/{userId}/Create
+        [HttpPost("ChatRooms/User/{userId}/Create")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateChatRoom(int userId, [Bind("Id,RoomName")] ChatRoom chatRoom)
+        {
+            try
+            {
+                var user = await _context.User.FindAsync(userId);
+
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    user.ChatRooms.Add(chatRoom);
+                    chatRoom.Users?.Add(user);
+                    _context.Add(chatRoom);
+                    await _context.SaveChangesAsync();
+                    return Ok("Chat room created successfully");
+                }
+                else
+                {
+                    return BadRequest(ModelState);
+                }
+            }
+            catch
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
+        // POST: ChatRooms/Delete/{Id}
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteChatRoom(int id)
         {
-            if (_context.ChatRoom == null)
+            try 
             {
-                return Problem("Entity set 'CrossLangChatContext.ChatRoom'  is null.");
-            }
-            var chatRoom = await _context.ChatRoom.FindAsync(id);
-            if (chatRoom != null)
+                if(_context.ChatRoom == null) 
+                {
+                    return Problem("Entity set 'CrossLangChatContext.ChatRoom'  is null.");
+                }
+
+                var chatRoom = await _context.ChatRoom.FindAsync(id);
+
+                if(chatRoom != null) {
+                    foreach (var user in chatRoom.Users!) 
+                    {
+                        user.ChatRooms.Remove(chatRoom);
+                    }
+
+                    _context.ChatRoom.Remove(chatRoom);
+
+                    await _context.SaveChangesAsync();
+
+                    return Ok("Chat room and associated users removed.");
+                } 
+                else 
+                {
+                    return NotFound("Chat room not found.");
+
+                }
+            } 
+            catch 
             {
-                _context.ChatRoom.Remove(chatRoom);
+                return StatusCode(500, "An error occurred while processing your request.");
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool ChatRoomExists(int id)

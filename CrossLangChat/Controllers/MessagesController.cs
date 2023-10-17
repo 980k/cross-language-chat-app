@@ -50,7 +50,7 @@ namespace CrossLangChat.Controllers
         public IActionResult Create()
         {
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName");
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Password");
+            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language");
             return View();
         }
 
@@ -68,7 +68,7 @@ namespace CrossLangChat.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Password", message.SenderId);
+            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
             return View(message);
         }
 
@@ -86,7 +86,7 @@ namespace CrossLangChat.Controllers
                 return NotFound();
             }
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Password", message.SenderId);
+            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
             return View(message);
         }
 
@@ -123,7 +123,7 @@ namespace CrossLangChat.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Password", message.SenderId);
+            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
             return View(message);
         }
 

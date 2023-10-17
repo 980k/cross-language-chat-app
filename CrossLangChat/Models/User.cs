@@ -17,6 +17,9 @@ namespace CrossLangChat.Models
         [Required(ErrorMessage = "Password is required.")]
         public string ? Password { get; set; }
 
+        [Required(ErrorMessage = "Language is required.")]
+        public string ? Language { get; set; }
+
         public ICollection<ChatRoom> ChatRooms { get; set; } = new List<ChatRoom>();
     }
 }
