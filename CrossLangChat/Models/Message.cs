@@ -17,12 +17,14 @@ namespace CrossLangChat.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime Timestamp { get; set; }
 
-        [ForeignKey("SenderId")]
         public int SenderId { get; set; }
+
+        [ForeignKey("SenderId")]
         public User ? Sender { get; set; }
 
-        [ForeignKey("ChatRoomId")]
         public int ChatRoomId { get; set; }
+
+        [ForeignKey("ChatRoomId")]
         public ChatRoom ? ChatRoom { get; set; }
     }
 }

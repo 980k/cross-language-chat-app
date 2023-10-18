@@ -246,6 +246,35 @@ namespace CrossLangChat.Controllers
             }
         }
 
+        [HttpPost("ChatRooms/User/{userId}/Edit/{Id}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditChatRoomAddUser(int userId, int Id) 
+        {
+            try 
+            {
+                var user = await _context.User.FindAsync(userId);
+                var chatRoom = await _context.ChatRoom.FindAsync(Id);
+
+                if (user == null || chatRoom == null) 
+                {
+                    return NotFound();
+                }
+
+                if (!chatRoom!.Users!.Contains(user))
+                {
+                    chatRoom.Users.Add(user);
+                    user.ChatRooms.Add(chatRoom);
+                    await _context.SaveChangesAsync();
+                }
+
+                return Ok("User added to chat room");
+            }
+            catch 
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+        }
+
         private bool ChatRoomExists(int id)
         {
           return (_context.ChatRoom?.Any(e => e.Id == id)).GetValueOrDefault();

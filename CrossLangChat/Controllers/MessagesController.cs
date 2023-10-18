@@ -54,23 +54,23 @@ namespace CrossLangChat.Controllers
             return View();
         }
 
-        // POST: Messages/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Content,Timestamp,SenderId,ChatRoomId")] Message message)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(message);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
-            return View(message);
-        }
+        // // POST: Messages/Create
+        // // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> Create([Bind("Id,Content,Timestamp,SenderId,ChatRoomId")] Message message)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         _context.Add(message);
+        //         await _context.SaveChangesAsync();
+        //         return RedirectToAction(nameof(Index));
+        //     }
+        //     ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
+        //     ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
+        //     return View(message);
+        // }
 
         // GET: Messages/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -165,6 +165,20 @@ namespace CrossLangChat.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+
+        /*
+        ***
+        CUSTOM ROUTES
+        ***
+        */
+
+        // POST: Messages/Create
+        
+
+
+
+
 
         private bool MessageExists(int id)
         {

@@ -5,6 +5,7 @@ using CrossLangChat.Controllers;
 using CrossLangChat.Models;
 using CrossLangChat.Data;
 using Microsoft.EntityFrameworkCore.Update.Internal;
+using NuGet.Versioning;
 
 namespace CrossLangChat.Test
 {
@@ -33,7 +34,7 @@ namespace CrossLangChat.Test
         public async Task ChatRoomsController_CreateChatRoom_ShouldAssociateUser() 
         {
             var userController = new UsersController(_context!);
-            var newUser = new User { Id = 2, Username = "testUser2", Password = "test2", Language="English" };
+            var newUser = new User { Id = 2, Username = "testUser2", Password = "test2", Language = "English" };
 
             await userController.Create(newUser);
 
@@ -85,28 +86,46 @@ namespace CrossLangChat.Test
             Assert.AreEqual(0, existingUser?.ChatRooms.Count);
         }
 
-        // [Test]
-        // public async Task ChatRoomsController_AddMultipleUsersToChatRoom_ShouldReturnAllUsers()
-        // {
-        //     var userController = new UsersController(_context!);
-        //     var newUser1 = new User{ Id = 1, Username = "testUser1", Password = "test1", Language = "Spanish" };
-        //     var newUser2 = new User{ Id = 2, Username = "testUser2", Password = "test2", Language = "Portuguese" };
+        [Test]
+        public async Task ChatRoomsController_AddMultipleUsersToChatRoom_ShouldReturnAllUsers()
+        {
+            var userController = new UsersController(_context!);
+            var newUser1 = new User{ Id = 1, Username = "testUser1", Password = "test1", Language = "Spanish" };
+            var newUser2 = new User{ Id = 2, Username = "testUser2", Password = "test2", Language = "Portuguese" };
 
-        //     await userController.Create(newUser1);
-        //     await userController.Create(newUser2);
+            await userController.Create(newUser1);
+            await userController.Create(newUser2);
 
-        //     var ChatRoomController = new ChatRoomsController(_context!);
-        //     var newChatRoom = new ChatRoom { Id = 1, RoomName = "testRoom1" };
+            var ChatRoomController = new ChatRoomsController(_context!);
+            var newChatRoom = new ChatRoom { Id = 1, RoomName = "testRoom1" };
 
-        //     var existingUser1 = _context?.User.Find(1);
+            var existingUser1 = _context?.User.Find(1);
 
-        //     await ChatRoomController.CreateChatRoom(existingUser1!.Id, newChatRoom);
+            await ChatRoomController.CreateChatRoom(existingUser1!.Id, newChatRoom);
 
-        //     var existingChatRoom = _context?.ChatRoom.Find(1);
+            var existingChatRoom = _context?.ChatRoom.Find(1);
 
-        //     Assert.AreEqual(1, existingChatRoom?.Users?.Count);
+            Assert.IsNotNull(existingChatRoom?.Users?.Count);
+            Assert.AreEqual(1, existingChatRoom?.Users?.Count);
+            Assert.IsTrue(existingChatRoom!.Users!.Contains(existingUser1));
 
-        //     await ChatRoomController.AddUserChatRoom()
-        // }
+            var existingUser2 = _context?.User.Find(2);
+
+            Assert.IsFalse(existingChatRoom!.Users!.Contains(existingUser2!));
+
+            await ChatRoomController.EditChatRoomAddUser(existingUser2!.Id, existingChatRoom!.Id);
+
+            var updatedChatRoom = _context?.ChatRoom.Find(1);
+
+            var updatedUser1 = _context?.User.Find(1);
+            var updatedUser2 = _context?.User.Find(2);
+
+            Assert.IsNotNull(updatedChatRoom?.Users);
+            Assert.AreEqual(2, updatedChatRoom?.Users!.Count);
+            Assert.IsTrue(updatedChatRoom!.Users!.Contains(existingUser1));
+            Assert.IsTrue(updatedChatRoom!.Users!.Contains(existingUser2));
+            Assert.IsTrue(updatedUser1!.ChatRooms.Contains(updatedChatRoom));
+            Assert.IsTrue(updatedUser2!.ChatRooms.Contains(updatedChatRoom));
+        }
     }
 }
