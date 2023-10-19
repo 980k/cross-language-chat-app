@@ -47,20 +47,26 @@ namespace CrossLangChat.Test
 
             var createdChatRoom = _context?.ChatRoom.Find(1);
 
-            Message newMessage = new Message {
+            Message newMessage = new()
+            {
+                Id = 1,
                 SenderId = existingUser.Id,
                 ChatRoomId = createdChatRoom!.Id,
                 Content = "Hello"
             };
 
-            // await MessagesController.CreateMessage(newMessage);
+            var messageController = new MessagesController(_context!);
 
-            // var createdMessage = _context?.Message.Find(1);
+            messageController?.CreateMessage(newMessage);
 
-            // Assert.IsNotNull(createdMessage);
+            var createdMessage = _context?.Message.Find(1);
 
-            Assert.Pass();
-
-        }
+            Assert.IsNotNull(createdMessage);
+            Assert.AreEqual(newMessage.SenderId, createdMessage?.SenderId);
+            Assert.AreEqual(existingUser, createdMessage?.Sender);
+            Assert.AreEqual(newMessage.ChatRoomId, createdMessage?.ChatRoomId);
+            Assert.AreEqual(createdChatRoom, createdMessage?.ChatRoom);
+            Assert.AreEqual("Hello", createdMessage?.Content);
+        }        
     }
 }

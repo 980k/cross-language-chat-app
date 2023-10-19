@@ -174,12 +174,29 @@ namespace CrossLangChat.Controllers
         */
 
         // POST: Messages/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateMessage([Bind("Id, SenderId, ChatRoomId, Content")] Message message)
+        {
+            if(ModelState.IsValid)
+            {
+                try 
+                {
+                    _context.Add(message);
+                    await _context.SaveChangesAsync();
+                    return Ok("Successfully created message");
+                }
+                catch
+                {
+                    return StatusCode(500, "An error occurred while processing your request.");
+                }
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
         
-
-
-
-
-
         private bool MessageExists(int id)
         {
           return (_context.Message?.Any(e => e.Id == id)).GetValueOrDefault();
