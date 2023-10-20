@@ -49,8 +49,8 @@ namespace CrossLangChat.Test
             var updatedUser = _context?.User.Find(1);
 
             // Assert
-            Assert.IsNotNull(updatedUser, "User with Id 1 should exist in the database after edit");
-            Assert.AreEqual("Chinese", updatedUser?.Language, "User's language should be updated to Chinese");
+            Assert.That(updatedUser, Is.Not.Null, "User with Id 1 should exist in the database after edit");
+            Assert.That(updatedUser?.Language, Is.EqualTo("Chinese"), "User's language should be updated to Chinese");
         }
     }
 }
