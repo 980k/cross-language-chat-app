@@ -20,6 +20,12 @@ namespace CrossLangChat.Controllers
             _context = context;
         }
 
+        public IActionResult Login()
+        {
+            return View("Login");
+        }
+
+        // POST: Accounts/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind("Username,Password")] LoginViewModel model)

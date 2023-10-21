@@ -13,10 +13,26 @@ public class HomeController : Controller
         _logger = logger;
     }
 
+    // public IActionResult Index()
+    // {
+    //     var Id = HttpContext.Session.GetInt32("Id");
+    //     var Username = HttpContext.Session.GetString("Username");
+
+    //     if(Id == null || Username == null) 
+    //     {
+    //         return RedirectToAction("Login", "Accounts");
+    //     }
+    //     else 
+    //     {
+    //         return View();
+    //     }
+    // }
+
     public IActionResult Index()
     {
-        return View("Login");
+        return View();
     }
+    
 
     public IActionResult Privacy()
     {

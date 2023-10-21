@@ -31,7 +31,7 @@ namespace CrossLangChat.Test
         }
 
         [Test]
-        public async Task ChatRoomsController_CreateChatRoom_ShouldAssociateUser() 
+        public async Task ChatRoomsController_CreateChatRoom_ShouldAssociateUser()
         {
             var userController = new UsersController(_context!);
             var newUser = new User { Id = 2, Username = "testUser2", Password = "test2", Language = "English" };
@@ -43,7 +43,7 @@ namespace CrossLangChat.Test
 
             var existingUser = _context?.User.Find(2);
 
-            Assert.AreEqual(0, existingUser?.ChatRooms.Count);
+            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(0));
 
             await chatRoomController.CreateChatRoom(existingUser!.Id, newChatRoom);
 
@@ -51,10 +51,10 @@ namespace CrossLangChat.Test
 
             existingUser = _context?.User.Find(2);
 
-            Assert.AreEqual(1, createdChatRoom?.Users?.Count);
-            Assert.AreEqual(1, existingUser?.ChatRooms.Count);
-            Assert.AreEqual(createdChatRoom, existingUser?.ChatRooms.FirstOrDefault());
-            Assert.AreEqual(createdChatRoom?.RoomName, existingUser?.ChatRooms?.FirstOrDefault()?.RoomName);
+            Assert.That(createdChatRoom?.Users?.Count, Is.EqualTo(1));
+            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(1));
+            Assert.That(existingUser?.ChatRooms.FirstOrDefault(), Is.EqualTo(createdChatRoom));
+            Assert.That(existingUser?.ChatRooms?.FirstOrDefault()?.RoomName, Is.EqualTo(createdChatRoom?.RoomName));
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace CrossLangChat.Test
 
             await ChatRoomController.CreateChatRoom(existingUser!.Id, newChatRoom);
 
-            Assert.AreEqual(1, existingUser?.ChatRooms.Count);
+            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(1));
 
             var existingChatRoom = _context?.ChatRoom.Find(10);
 
@@ -82,8 +82,8 @@ namespace CrossLangChat.Test
 
             existingUser = _context?.User.Find(5);
 
-            Assert.IsNull(existingChatRoom);
-            Assert.AreEqual(0, existingUser?.ChatRooms.Count);
+            Assert.That(existingChatRoom, Is.Null);
+            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -105,9 +105,9 @@ namespace CrossLangChat.Test
 
             var existingChatRoom = _context?.ChatRoom.Find(1);
 
-            Assert.IsNotNull(existingChatRoom?.Users?.Count);
-            Assert.AreEqual(1, existingChatRoom?.Users?.Count);
-            Assert.IsTrue(existingChatRoom!.Users!.Contains(existingUser1));
+            Assert.That(existingChatRoom?.Users?.Count, Is.Not.Null);
+            Assert.That(existingChatRoom?.Users?.Count, Is.EqualTo(1));
+            Assert.That(existingChatRoom!.Users!.Contains(existingUser1), Is.True);
 
             var existingUser2 = _context?.User.Find(2);
 
@@ -120,9 +120,9 @@ namespace CrossLangChat.Test
             var updatedUser1 = _context?.User.Find(1);
             var updatedUser2 = _context?.User.Find(2);
 
-            Assert.IsNotNull(updatedChatRoom?.Users);
-            Assert.AreEqual(2, updatedChatRoom?.Users!.Count);
-            Assert.IsTrue(updatedChatRoom!.Users!.Contains(existingUser1));
+            Assert.That(updatedChatRoom?.Users, Is.Not.Null);
+            Assert.That(updatedChatRoom?.Users!.Count, Is.EqualTo(2));
+            Assert.That(updatedChatRoom!.Users!.Contains(existingUser1), Is.True);
             Assert.IsTrue(updatedChatRoom!.Users!.Contains(existingUser2));
             Assert.IsTrue(updatedUser1!.ChatRooms.Contains(updatedChatRoom));
             Assert.IsTrue(updatedUser2!.ChatRooms.Contains(updatedChatRoom));

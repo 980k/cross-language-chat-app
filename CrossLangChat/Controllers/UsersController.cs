@@ -155,6 +155,26 @@ namespace CrossLangChat.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        /*
+            Custom Routes
+        */
+
+        // GET: Users Chatrooms
+        public async Task<IActionResult> GetUserChatRooms(int id)
+        {
+            var user = await _context.User.FindAsync(id);
+
+            if(user != null)
+            {
+                return Ok(user.ChatRooms.ToList());
+            }
+            else
+            {
+                return Problem("User does not exist.");
+            }
+        }
+
         private bool UserExists(int id)
         {
           return (_context.User?.Any(e => e.Id == id)).GetValueOrDefault();
