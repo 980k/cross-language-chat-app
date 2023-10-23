@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using CrossLangChat.Data;
 using CrossLangChat.Models;
 using NuGet.Versioning;
@@ -14,10 +15,12 @@ namespace CrossLangChat.Controllers
     public class ChatRoomsController : Controller
     {
         private readonly CrossLangChatContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ChatRoomsController(CrossLangChatContext context)
+        public ChatRoomsController(CrossLangChatContext context,  IHttpContextAccessor httpContextAccessor )
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: ChatRooms
@@ -175,13 +178,14 @@ namespace CrossLangChat.Controllers
         ***
         */
 
-        // POST: ChatRooms/User/{userId}/Create
-        [HttpPost("ChatRooms/User/{userId}/Create")]
+        // POST: ChatRooms/CreateChatRoom
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateChatRoom(int userId, [Bind("Id,RoomName")] ChatRoom chatRoom)
+        public async Task<IActionResult> CreateChatRoom([Bind("Id,RoomName")] ChatRoom chatRoom)
         {
             try
             {
+                var userId = HttpContext.Session.GetInt32("Id");
                 var user = await _context.User.FindAsync(userId);
 
                 if (user == null)
@@ -195,7 +199,7 @@ namespace CrossLangChat.Controllers
                     chatRoom.Users?.Add(user);
                     _context.Add(chatRoom);
                     await _context.SaveChangesAsync();
-                    return Ok("Chat room created successfully");
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -274,6 +278,20 @@ namespace CrossLangChat.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
+
+        // [HttpGet("ChatRooms/User/Create")]
+        // public IActionResult CreateChatRoom(int userId)
+        // {
+        //     // You can perform any necessary logic here, such as loading data for the form.
+        //     // For example, you might load additional data based on the userId parameter.
+            
+        //     // Assuming you have a view model, you can pass it to the view like this:
+        //     // var viewModel = new YourViewModel();
+        //     // return View(viewModel);
+            
+        //     // If you just want to display the form without any specific data, you can simply return the view.
+        //     return View("CreateChat");
+        // }
 
         private bool ChatRoomExists(int id)
         {

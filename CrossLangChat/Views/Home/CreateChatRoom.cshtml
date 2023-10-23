@@ -1,0 +1,96 @@
+@model CrossLangChat.Models.ChatRoom
+
+@{
+    ViewData["Title"] = "Create New Chat";
+    var chatRooms = ViewData["ChatRooms"] as List<ChatRoom>;
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="add-chat-button" id="new-chat-button">
+                <a href="#" class="chat-create-link">+ New Chat</a>
+            </div>
+                <div class="users-list">
+                    @foreach (var chatRoom in chatRooms)
+                    {
+                        <div class="user">
+                            <a href="#" class="chat-room-link" data-chatroomId="@chatRoom.Id">@chatRoom.RoomName</a>
+                            <form asp-action="Delete" asp-route-id="@chatRoom.Id" method="post">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+        </div>
+        <div class="chat-creation-container" id="chat-creation-container" style="display:none;">
+            <form asp-action="CreateChatRoom" asp-controller="ChatRooms" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="RoomName" class="control-label"></label>
+                    <input asp-for="RoomName" class="form-control" />
+                    <span asp-validation-for="RoomName" class="text-danger"></span>
+                </div>
+                <input type="hidden" name="userId" value=2 />
+
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get the button and the chat creation form container by their IDs
+        var newChatButton = document.getElementById("new-chat-button");
+        var chatCreationContainer = document.getElementById("chat-creation-container");
+        var chatContainer = document.getElementById("chat-container");
+
+        document.addEventListener("DOMContentLoaded", function() {
+        var chatRoomLinks = document.querySelectorAll(".chat-room-link");
+
+        chatRoomLinks.forEach(function(link) {
+            link.addEventListener("click", function(event) {
+                event.preventDefault();
+                var chatRoomId = link.getAttribute("data-chatroomId");
+
+                // Update the URL using the History API
+                var newUrl = "/chatroom/" + chatRoomId; // Example URL format
+                history.pushState({ chatRoomId: chatRoomId }, "", newUrl);
+
+                // Perform your navigation logic here (e.g., loading chat messages) based on the chatRoomId
+                // Example: LoadChatMessages(chatRoomId);
+                chatContainer.style.display = "flex";
+                chatCreationContainer.style.display = "none";
+            });
+        });
+
+        var newChatButton = document.querySelector(".chat-create-link");
+
+        // Add click event listener to the "New Chat" button
+        newChatButton.addEventListener("click", function(event) {
+            // Prevent the default behavior of the link (preventing navigation)
+            event.preventDefault();
+
+            // Update the URL using the History API
+            var newUrl = "/ChatRooms/CreateChatRoom";
+            history.pushState(null, null, newUrl);
+
+            // Perform any other actions related to the new chat creation here
+            
+            chatCreationContainer.style.display = "block";
+            chatContainer.style.display = "none";
+        });
+});
+
+    </script>
+
+</body>
+</html>

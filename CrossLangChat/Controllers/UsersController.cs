@@ -167,7 +167,8 @@ namespace CrossLangChat.Controllers
 
             if(user != null)
             {
-                return Ok(user.ChatRooms.ToList());
+                var chatRooms = user.ChatRooms.ToList();
+                return View("Home/Index", chatRooms);
             }
             else
             {
