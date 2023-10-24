@@ -4,6 +4,14 @@
     grid-column-gap: 10px;
 }
 
+.app-version {
+    position: absolute;
+    font-size: 20px;
+    color: #ccc;
+    top: 50%;
+    left: 50%;
+}
+
 .sidebar {
     background-color: #333;
     color: white;
@@ -12,13 +20,39 @@
 }
 
 .add-chat-button {
+    display: block;
+    width: 100%;    
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
+    text-decoration: none;
+    color: white;
 }
 
-.add-chat-button:hover {
+.add-chat-button:hover, .add-chat-button:focus {
+    text-decoration: none;
+    color: white;
+}
+
+.chat-room-name {
+    text-decoration: none;
+    color: white;
+}
+
+.chat-room-name:hover, .chat-room-name:focus {
+    text-decoration: none;
+    color: white;
+}
+
+.delete-button {
+    background-color: transparent;
+    font-weight: lighter;
+    border: none;
+    color: inherit;
+    font-size: 15px;
+    padding: 0;
     cursor: pointer;
+    margin-left: auto;
 }
 
 .users-list {
@@ -28,9 +62,12 @@
 }
 
 .user {
+    display: flex;
+    align-items: center;
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s;
+    justify-content: space-between;
 }
 
 .user:hover {

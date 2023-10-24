@@ -1,0 +1,15 @@
+@model CrossLangChat.Models.ChatRoom
+
+<h2>Create Chat Room</h2>
+
+<div class="create-chatroom">
+    <form asp-action="CreateChatRoom" asp-controller="ChatRooms" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="RoomName" class="control-label"></label>
+            <input asp-for="RoomName" class="form-control" />
+            <span asp-validation-for="RoomName" class="text-danger"></span>
+        </div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </form>
+</div>

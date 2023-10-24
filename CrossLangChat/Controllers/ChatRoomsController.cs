@@ -49,43 +49,43 @@ namespace CrossLangChat.Controllers
             return View(chatRoom);
         }
 
-        // GET: ChatRooms/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
+        // // GET: ChatRooms/Create
+        // public IActionResult Create()
+        // {
+        //     return View();
+        // }
 
-        // POST: ChatRooms/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,RoomName")] ChatRoom chatRoom)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(chatRoom);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(chatRoom);
-        }
+        // // POST: ChatRooms/Create
+        // // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // [HttpPost]
+        // [ValidateAntiForgeryToken]
+        // public async Task<IActionResult> Create([Bind("Id,RoomName")] ChatRoom chatRoom)
+        // {
+        //     if (ModelState.IsValid)
+        //     {
+        //         _context.Add(chatRoom);
+        //         await _context.SaveChangesAsync();
+        //         return RedirectToAction(nameof(Index));
+        //     }
+        //     return View(chatRoom);
+        // }
 
-        // GET: ChatRooms/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null || _context.ChatRoom == null)
-            {
-                return NotFound();
-            }
+        // // GET: ChatRooms/Edit/5
+        // public async Task<IActionResult> Edit(int? id)
+        // {
+        //     if (id == null || _context.ChatRoom == null)
+        //     {
+        //         return NotFound();
+        //     }
 
-            var chatRoom = await _context.ChatRoom.FindAsync(id);
-            if (chatRoom == null)
-            {
-                return NotFound();
-            }
-            return View(chatRoom);
-        }
+        //     var chatRoom = await _context.ChatRoom.FindAsync(id);
+        //     if (chatRoom == null)
+        //     {
+        //         return NotFound();
+        //     }
+        //     return View(chatRoom);
+        // }
 
         // POST: ChatRooms/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -178,6 +178,45 @@ namespace CrossLangChat.Controllers
         ***
         */
 
+        // GET: ChatRooms/{Id}
+        [HttpGet, ActionName("Get")]
+        public async Task<IActionResult> GetChatRoom(int? id) 
+        {
+            var Id = HttpContext.Session.GetInt32("Id");
+            var Username = HttpContext.Session.GetString("Username");
+
+            if(Id == null || Username == null)
+            {
+                return RedirectToAction("Login", "Accounts");
+            }
+
+            var user = await _context.User
+                .Include(u => u.ChatRooms)
+                .FirstOrDefaultAsync(u => u.Id == Id);
+
+            if (user != null)
+            {
+                var chatRooms = user.ChatRooms.ToList();
+
+                ViewData["ChatRooms"] = chatRooms;
+
+                var chatRoom = chatRooms.Find(c => c.Id == id);
+
+                if(chatRoom != null) 
+                {
+                    return View("Chat", chatRoom);
+                }
+            }
+
+            return NotFound("Chat room not found.");
+        }
+
+        // GET : ChatRooms/CreateChatRoom
+        [HttpGet, ActionName("Create")]
+        public IActionResult CreateChatRoom() {
+            return View("CreateChatRoom");
+        }
+
         // POST: ChatRooms/CreateChatRoom
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -236,7 +275,7 @@ namespace CrossLangChat.Controllers
 
                     await _context.SaveChangesAsync();
 
-                    return Ok("Chat room and associated users removed.");
+                    return RedirectToAction("Index", "Home");
                 } 
                 else 
                 {
@@ -278,20 +317,6 @@ namespace CrossLangChat.Controllers
                 return StatusCode(500, "An error occurred while processing your request.");
             }
         }
-
-        // [HttpGet("ChatRooms/User/Create")]
-        // public IActionResult CreateChatRoom(int userId)
-        // {
-        //     // You can perform any necessary logic here, such as loading data for the form.
-        //     // For example, you might load additional data based on the userId parameter.
-            
-        //     // Assuming you have a view model, you can pass it to the view like this:
-        //     // var viewModel = new YourViewModel();
-        //     // return View(viewModel);
-            
-        //     // If you just want to display the form without any specific data, you can simply return the view.
-        //     return View("CreateChat");
-        // }
 
         private bool ChatRoomExists(int id)
         {

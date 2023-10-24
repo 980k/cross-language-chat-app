@@ -1,0 +1,48 @@
+@model CrossLangChat.Models.ChatRoom
+
+@{
+    ViewData["Title"] = "Chat Room";
+    var chatRooms = ViewData["ChatRooms"] as List<ChatRoom>;
+    var currentChatRoom = Model;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+        <a asp-action="Create" asp-controller="ChatRooms" class="add-chat-button">+ New Chat</a>
+            <div class="users-list">
+            @if (chatRooms != null)
+            {
+                foreach (var chatRoom in chatRooms)
+                {
+                    <div class="user">
+                        <a asp-action="Get" asp-controller="ChatRooms" 
+                        asp-route-id="@chatRoom.Id" class="chat-room-name">@chatRoom.RoomName</a>
+                        <form asp-action="Delete" asp-controller="ChatRooms" asp-route-id="@chatRoom.Id" method="post">
+                            <button type="submit" class="delete-button">X</button>
+                        </form>
+                    </div>
+                }
+            }
+            </div>
+        </div>
+            <div class="chat-container">
+                <div class="chat-header">@currentChatRoom.RoomName</div>
+                <div class="chat-box" id="chat-box"></div>
+                <div class="input-container">
+                    <input classs="type-message-input" type="text" id="user-input" placeholder="Type your message...">
+                    <button class="send-message-button">Send</button>
+                </div>
+            </div>    
+        </div>
+</body>
+</html>

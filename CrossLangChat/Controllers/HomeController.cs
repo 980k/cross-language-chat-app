@@ -38,7 +38,7 @@ public async Task<IActionResult> Index()
         {
             var chatRooms = user.ChatRooms.ToList();
 
-            ViewData["ChatRooms"] = chatRooms; // Store chatRooms list in ViewData
+            ViewData["ChatRooms"] = chatRooms;
 
             return View();
         }
@@ -102,6 +102,34 @@ public async Task<IActionResult> Index()
     //     return View();
     // }
     
+
+    public async Task<IActionResult> CreateChatRoom() 
+    {
+        try
+        {
+           var Id = HttpContext.Session.GetInt32("Id");
+           var Username = HttpContext.Session.GetString("Username");
+
+           var user = await _context.User
+            .Include(u => u.ChatRooms)
+            .FirstOrDefaultAsync(u => u.Id == Id);
+
+            if(user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            var chatRooms = user.ChatRooms.ToList();
+
+            ViewData["ChatRooms"] = chatRooms; // Store chatRooms list in ViewData
+
+            return View("CreateChatRoom");
+        }
+        catch
+        {
+            return StatusCode(500, "An error occurred while processing your request.");
+        }
+    }
 
     public IActionResult Privacy()
     {
