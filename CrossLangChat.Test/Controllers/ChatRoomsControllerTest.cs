@@ -12,11 +12,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace CrossLangChat.Test
 {
+    [TestFixture]
     public class ChatRoomsControllerTest
     {
         private CrossLangChatContext ? _context;
         private Mock<HttpContext> _httpContextMock;
-
         private Mock<DeepLTranslationService> _translationServiceMock;
 
         [SetUp]

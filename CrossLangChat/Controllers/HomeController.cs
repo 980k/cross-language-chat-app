@@ -50,38 +50,6 @@ public class HomeController : Controller
         }
     }
 
-        [HttpGet]
-        public IActionResult TranslateTest()
-        {
-            return View(new TranslationViewModel());
-        }
-        
-        [HttpPost]
-        public async Task<IActionResult> TranslateTest(TranslationViewModel model)
-        {
-            if (ModelState.IsValid && model.Text != null && model.TargetLanguage != null)
-            {
-                try
-                {
-                    // Call the TranslateAsync method with non-nullable string arrays
-                    model.TranslatedTexts = await _translationService.TranslateAsync(new[] { model.Text! }, model.TargetLanguage!);
-                }
-                catch (Exception ex)
-                {
-                    // Handle translation service exceptions (e.g., API errors) here
-                    ModelState.AddModelError(string.Empty, $"Translation failed: {ex.Message}");
-                }
-            }
-            else
-            {
-                // Handle null input values, if necessary
-                ModelState.AddModelError(string.Empty, "Invalid input values.");
-            }
-
-    return View(model);
-}
-
-
     public IActionResult Privacy()
     {
         return View();

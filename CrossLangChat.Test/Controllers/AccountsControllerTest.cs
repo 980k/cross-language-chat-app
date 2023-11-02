@@ -10,6 +10,7 @@ using CrossLangChat.ViewModels;
 
 namespace CrossLangChat.Test
 {
+    [TestFixture]
     public class AccountsControllerTest
     {
         private CrossLangChatContext ? _context;

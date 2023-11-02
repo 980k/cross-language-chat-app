@@ -1,4 +1,3 @@
-
 namespace CrossLangChat.APIModels
 {
     public class TranslationResponse

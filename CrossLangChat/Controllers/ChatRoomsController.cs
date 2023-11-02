@@ -18,12 +18,10 @@ namespace CrossLangChat.Controllers
 
         private readonly DeepLTranslationService _translationService;
 
-
         public ChatRoomsController(CrossLangChatContext context, DeepLTranslationService translationService)
         {
             _context = context;
             _translationService = translationService;
-
         }
 
         // GET: ChatRooms

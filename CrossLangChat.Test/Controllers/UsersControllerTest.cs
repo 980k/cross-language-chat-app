@@ -7,6 +7,7 @@ using CrossLangChat.Data;
 
 namespace CrossLangChat.Test
 {
+    [TestFixture]
     public class UsersControllerTest
     {
         private CrossLangChatContext ? _context;

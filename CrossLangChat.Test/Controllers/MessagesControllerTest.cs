@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace CrossLangChat.Test
 {
+    [TestFixture]
     public class MessagesControllerTest
     {
         private CrossLangChatContext ? _context;
@@ -65,8 +66,5 @@ namespace CrossLangChat.Test
                 Assert.That(result, Is.Not.InstanceOf<StatusCodeResult>());
                 Assert.That(result, Is.InstanceOf<ObjectResult>());
         }
-
-
-        
     }
 }
