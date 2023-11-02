@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using CrossLangChat.Models;
 using CrossLangChat.Data;
+using CrossLangChat.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CrossLangChatContext>(options =>
@@ -14,12 +14,23 @@ builder.Services.AddDistributedMemoryCache();
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(10);
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
 builder.Services.AddHttpContextAccessor();
+
+// Add DeepLTranslationService to the container
+builder.Services.AddScoped<DeepLTranslationService>(provider => 
+{
+    var apiKey = builder.Configuration["DEEPL_API_KEY"];
+    if (apiKey == null)
+    {
+        throw new ArgumentNullException(nameof(apiKey), "DeepL API key is missing in configuration.");
+    }
+    return new DeepLTranslationService(apiKey);
+});
 
 var app = builder.Build();
 
@@ -27,7 +38,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+
     app.UseHsts();
 }
 

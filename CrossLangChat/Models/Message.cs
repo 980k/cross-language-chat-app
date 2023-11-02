@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace CrossLangChat.Models
 {
@@ -10,21 +11,15 @@ namespace CrossLangChat.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Content is required.")]
         public string ? Content { get; set; }
 
-        [DataType(DataType.DateTime)]
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public DateTime Timestamp { get; set; }
+        [Required(ErrorMessage = "Username is required.")]
+        public string? SenderUsername { get; set; } // Store the username directly as a string
 
-        public int SenderId { get; set; }
+        [ForeignKey("ChatRoom")]
+        public int ChatRoomId { get; set; } // Foreign key for ChatRoom
 
-        [ForeignKey("SenderId")]
-        public User ? Sender { get; set; }
-
-        public int ChatRoomId { get; set; }
-
-        [ForeignKey("ChatRoomId")]
-        public ChatRoom ? ChatRoom { get; set; }
+        public ChatRoom ? ChatRoom { get; set; } // Navigation property to the associated ChatRoom
     }
 }

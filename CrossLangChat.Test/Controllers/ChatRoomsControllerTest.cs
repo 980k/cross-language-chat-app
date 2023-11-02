@@ -4,14 +4,20 @@ using NUnit.Framework;
 using CrossLangChat.Controllers;
 using CrossLangChat.Models;
 using CrossLangChat.Data;
+using CrossLangChat.Services;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 using NuGet.Versioning;
+using Moq;
+using Microsoft.AspNetCore.Http;
 
 namespace CrossLangChat.Test
 {
     public class ChatRoomsControllerTest
     {
         private CrossLangChatContext ? _context;
+        private Mock<HttpContext> _httpContextMock;
+
+        private Mock<DeepLTranslationService> _translationServiceMock;
 
         [SetUp]
         public void Setup()
@@ -21,6 +27,13 @@ namespace CrossLangChat.Test
                 .Options;
 
             _context = new CrossLangChatContext(options);
+
+            _httpContextMock = new Mock<HttpContext>();
+            _httpContextMock.Setup(c => c.Session).Returns(new Mock<ISession>().Object);
+
+            string apiKey = "PLACEHOLDER_API_KEY";
+
+            _translationServiceMock = new Mock<DeepLTranslationService>(apiKey);
         }
 
         [TearDown]
@@ -31,101 +44,74 @@ namespace CrossLangChat.Test
         }
 
         [Test]
-        public async Task ChatRoomsController_CreateChatRoom_ShouldAssociateUser()
-        {
-            var userController = new UsersController(_context!);
-            var newUser = new User { Id = 2, Username = "testUser2", Password = "test2", Language = "English" };
+        public async Task ChatRoomsController_CreateChatRoom_ShouldReturnChatRoom() {
+            var chatRoomController = new ChatRoomsController(_context!, _translationServiceMock.Object);
 
-            await userController.Create(newUser);
+            var newChatRoom = new ChatRoom { Id = 1, RoomName = "Room 1" };
 
-            var chatRoomController = new ChatRoomsController(_context!);
-            var newChatRoom = new ChatRoom { Id = 3, RoomName = "testRoom3" };
+            var result = await chatRoomController.Create(newChatRoom) as RedirectToActionResult;
 
-            var existingUser = _context?.User.Find(2);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
 
-            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(0));
+            var existingChatRoom = await _context!.ChatRoom.FindAsync(1);
 
-            await chatRoomController.CreateChatRoom(existingUser!.Id, newChatRoom);
-
-            var createdChatRoom = _context?.ChatRoom.Find(3);
-
-            existingUser = _context?.User.Find(2);
-
-            Assert.That(createdChatRoom?.Users?.Count, Is.EqualTo(1));
-            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(1));
-            Assert.That(existingUser?.ChatRooms.FirstOrDefault(), Is.EqualTo(createdChatRoom));
-            Assert.That(existingUser?.ChatRooms?.FirstOrDefault()?.RoomName, Is.EqualTo(createdChatRoom?.RoomName));
+            Assert.That(existingChatRoom, Is.EqualTo(newChatRoom));
         }
 
         [Test]
-        public async Task ChatRoomsController_DeleteChatRoom_ShouldReturnOneLess()
-        {
+        public async Task ChatRoomsController_AddUser_ShouldReturnUpdatedChatRoom() {
+            var chatRoomController = new ChatRoomsController(_context!, _translationServiceMock.Object);
+
+            var newChatRoom = new ChatRoom { Id = 2, RoomName = "Room 2" };
+
+            await chatRoomController.Create(newChatRoom);
+
             var userController = new UsersController(_context!);
-            var newUser = new User{ Id = 5, Username = "testUser5", Password = "test5", Language = "Japanese" };
+
+            var newUser = new User { Id = 3, Username = "testUser3", Password = "test3", Language = "JA" };
 
             await userController.Create(newUser);
 
-            var ChatRoomController = new ChatRoomsController(_context!);
-            var newChatRoom = new ChatRoom { Id = 10, RoomName = "testRoom10" };
+            var result = await chatRoomController.EditChatRoomAddUser(newUser.Username, newChatRoom.Id) as RedirectToActionResult;
 
-            var existingUser = _context?.User.Find(5);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+            Assert.That(result.ActionName, Is.EqualTo("Index"));
+            Assert.That(result.ControllerName, Is.EqualTo("Home"));
 
-            await ChatRoomController.CreateChatRoom(existingUser!.Id, newChatRoom);
+            var existingChatRoom = await _context!.ChatRoom.FindAsync(2);
 
-            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(1));
+            Assert.That(existingChatRoom, Is.Not.Null);
+            Assert.That(existingChatRoom.Users, Is.Not.Null);
+            Assert.That(existingChatRoom.Users, Has.Count.EqualTo(1));
 
-            var existingChatRoom = _context?.ChatRoom.Find(10);
-
-            await ChatRoomController.DeleteChatRoom(existingChatRoom!.Id);
-
-            existingChatRoom = _context?.ChatRoom.Find(10);
-
-            existingUser = _context?.User.Find(5);
-
-            Assert.That(existingChatRoom, Is.Null);
-            Assert.That(existingUser?.ChatRooms.Count, Is.EqualTo(0));
+            CollectionAssert.Contains(existingChatRoom.Users, newUser);
         }
 
         [Test]
-        public async Task ChatRoomsController_AddMultipleUsersToChatRoom_ShouldReturnAllUsers()
-        {
-            var userController = new UsersController(_context!);
-            var newUser1 = new User{ Id = 1, Username = "testUser1", Password = "test1", Language = "Spanish" };
-            var newUser2 = new User{ Id = 2, Username = "testUser2", Password = "test2", Language = "Portuguese" };
+        public async Task ChatRoomsController_DeleteChatRoom_ShouldReturnNone() {
+            var chatRoomController = new ChatRoomsController(_context!, _translationServiceMock.Object);
 
-            await userController.Create(newUser1);
-            await userController.Create(newUser2);
+            var newChatRoom = new ChatRoom { Id = 3, RoomName = "Room 3" };
 
-            var ChatRoomController = new ChatRoomsController(_context!);
-            var newChatRoom = new ChatRoom { Id = 1, RoomName = "testRoom1" };
+            await chatRoomController.Create(newChatRoom);
 
-            var existingUser1 = _context?.User.Find(1);
+             var existingChatRoom = await _context!.ChatRoom.FindAsync(3);
 
-            await ChatRoomController.CreateChatRoom(existingUser1!.Id, newChatRoom);
+            Assert.That(existingChatRoom, Is.Not.Null);
+            Assert.That(existingChatRoom, Is.EqualTo(newChatRoom));
 
-            var existingChatRoom = _context?.ChatRoom.Find(1);
+            var result = await chatRoomController.DeleteChatRoom(existingChatRoom.Id) as RedirectToActionResult;
 
-            Assert.That(existingChatRoom?.Users?.Count, Is.Not.Null);
-            Assert.That(existingChatRoom?.Users?.Count, Is.EqualTo(1));
-            Assert.That(existingChatRoom!.Users!.Contains(existingUser1), Is.True);
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result, Is.TypeOf<RedirectToActionResult>());
+            Assert.That(result.ActionName, Is.EqualTo("Index"));
+            Assert.That(result.ControllerName, Is.EqualTo("Home"));
 
-            var existingUser2 = _context?.User.Find(2);
+            var deletedChatRoom = await _context!.ChatRoom.FindAsync(3);
 
-            Assert.IsFalse(existingChatRoom!.Users!.Contains(existingUser2!));
-
-            await ChatRoomController.EditChatRoomAddUser(existingUser2!.Id, existingChatRoom!.Id);
-
-            var updatedChatRoom = _context?.ChatRoom.Find(1);
-
-            var updatedUser1 = _context?.User.Find(1);
-            var updatedUser2 = _context?.User.Find(2);
-
-            Assert.That(updatedChatRoom?.Users, Is.Not.Null);
-            Assert.That(updatedChatRoom?.Users!.Count, Is.EqualTo(2));
-            Assert.That(updatedChatRoom!.Users!.Contains(existingUser1), Is.True);
-            Assert.IsTrue(updatedChatRoom!.Users!.Contains(existingUser2));
-            Assert.IsTrue(updatedUser1!.ChatRooms.Contains(updatedChatRoom));
-            Assert.IsTrue(updatedUser2!.ChatRooms.Contains(updatedChatRoom));
-        }
+            Assert.That(deletedChatRoom, Is.Null);
+        } 
     }
 }

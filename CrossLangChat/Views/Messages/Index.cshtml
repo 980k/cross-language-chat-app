@@ -16,10 +16,7 @@
                 @Html.DisplayNameFor(model => model.Content)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Timestamp)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sender)
+                @Html.DisplayNameFor(model => model.SenderUsername)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ChatRoom)
@@ -34,13 +31,10 @@
                 @Html.DisplayFor(modelItem => item.Content)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Timestamp)
+                @Html.DisplayFor(modelItem => item.SenderUsername)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Sender.Language)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ChatRoom.RoomName)
+                @Html.DisplayFor(modelItem => item.ChatRoom!.RoomName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

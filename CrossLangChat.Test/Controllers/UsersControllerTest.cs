@@ -29,74 +29,62 @@ namespace CrossLangChat.Test
         }
 
         [Test]
-        public async Task UserController_UserUpdateLanguage_ShouldReturnUpdatedLanguage()
+        public async Task UsersController_CreateNewUser_ShouldReturnUser()
         {
-            // Arrange
             var userController = new UsersController(_context!);
-            var newUser = new User { Id = 1, Username = "testUser1", Password = "test1", Language = "English" };
+            var newUser = new User { Id = 2, Username = "testUser2", Password = "test2", Language = "ZH" };
 
-            // Act
-            await userController.Create(newUser);
+            var result = await userController.Create(newUser) as RedirectToActionResult;
 
-            // Fetch the entity from the database
-            var existingUser = _context?.User.Find(1);
+            Assert.NotNull(result);
 
-            // Modify the language using the Edit method
-            existingUser!.Language = "Chinese";
-            await userController.Edit(1, existingUser);
+            var existingUser = await _context!.User.FindAsync(2);
 
-            // Reload user from context after edit
-            var updatedUser = _context?.User.Find(1);
-
-            // Assert
-            Assert.That(updatedUser, Is.Not.Null, "User with Id 1 should exist in the database after edit");
-            Assert.That(updatedUser?.Language, Is.EqualTo("Chinese"), "User's language should be updated to Chinese");
+            Assert.That(existingUser?.Username, Is.EqualTo(newUser.Username));
+            Assert.That(existingUser.Password, Is.EqualTo(newUser.Password));
         }
 
         [Test]
-        public async Task UsersController_GetUserChatRooms_ShouldReturnChatRooms()
+        public async Task UsersController_EditUserLanguage_ShouldReturnUser()
         {
             var userController = new UsersController(_context!);
-            var newUser = new User { Id = 7, Username = "testUser7", Password = "test7", Language = "German" };
+            var newUser = new User { Id = 3, Username = "testUser3", Password = "test3", Language = "ES" };
 
             await userController.Create(newUser);
 
-            var chatRoomController = new ChatRoomsController(_context!);
-            var newChatRoom1 = new ChatRoom { Id = 2, RoomName = "testUser7's Room 1" };
-            var newChatRoom2 = new ChatRoom { Id = 3, RoomName = "testUser7's Room 2" };
+            var existingUser = await _context!.User.FindAsync(3);
 
-            var existingUser = _context?.User.Find(7);
+            existingUser!.Language = "KO";
 
-            await chatRoomController.CreateChatRoom(existingUser!.Id, newChatRoom1);
-            await chatRoomController.CreateChatRoom(existingUser!.Id, newChatRoom2);
+            var result = await userController.Edit(existingUser.Id, existingUser) as RedirectToActionResult;
 
-            var ChatRooms = await userController.GetUserChatRooms(existingUser.Id) as OkObjectResult;
+            Assert.NotNull(result);
 
-            Assert.That(ChatRooms, Is.Not.Null);
+            var updatedUser = await _context.User.FindAsync(3);
 
-            var result = ChatRooms!.Value as List<ChatRoom>;
-
-            var existingChatRoom1 = _context!.ChatRoom.Find(2);
-            var existingChatRoom2 = _context!.ChatRoom.Find(3);
-
-
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result, Has.Count.EqualTo(2));
-            Assert.Multiple(() =>
-            {
-                Assert.That(result[0], Is.EqualTo(existingChatRoom1));
-                Assert.That(result[1], Is.EqualTo(existingChatRoom2));
-            });
+            Assert.That(existingUser.Language, Is.EqualTo(updatedUser?.Language));
         }
 
         [Test]
-        public async Task UserControllers_GetUserChatRooms_ShouldReturnNone()
+        public async Task UsersController_DeleteUser_ShouldReturnNone()
         {
             var userController = new UsersController(_context!);
+            var newUser = new User { Id = 4, Username = "testUser4", Password = "test4", Language = "DE" };
 
-            var ChatRooms = await userController.GetUserChatRooms(5) as OkObjectResult;
+            await userController.Create(newUser);
 
-            Assert.That(ChatRooms, Is.Null);
+            var existingUser = await _context!.User.FindAsync(4);
+
+            Assert.NotNull(existingUser);
+            Assert.That(newUser, Is.EqualTo(existingUser));
+
+            var result = await userController.DeleteConfirmed(existingUser.Id) as RedirectToActionResult;
+
+            Assert.NotNull(result);
+
+            var deletedUser = await _context.User.FindAsync(4);
+
+            Assert.Null(deletedUser);
         }
     }
 }

@@ -1,6 +1,4 @@
-﻿@model CrossLangChat.Models.ChatRoom
-
-@{
+﻿@{
     ViewData["Title"] = "Home Page";
     var chatRooms = ViewData["ChatRooms"] as List<ChatRoom>;
 }
@@ -23,11 +21,11 @@
                 foreach (var chatRoom in chatRooms)
                 {
                     <div class="user">
-                        <a asp-action="Get" asp-controller="ChatRooms" 
+                        <a asp-action="GetChatRoom" asp-controller="ChatRooms" 
                         asp-route-id="@chatRoom.Id" class="chat-room-name">@chatRoom.RoomName</a>
-
-                        <form asp-action="Delete" asp-controller="ChatRooms" asp-route-id="@chatRoom.Id" method="post">
-                            <button type="submit" class="delete-button">X</button>
+                        
+                        <form asp-action="DeleteChatRoom" asp-controller="ChatRooms" asp-route-id="@chatRoom.Id" method="post">
+                            <button type="submit" class="delete-chat-button">X</button>
                         </form>
                     </div>
                 }

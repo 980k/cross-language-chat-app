@@ -44,7 +44,7 @@
     color: white;
 }
 
-.delete-button {
+.delete-chat-button {
     background-color: transparent;
     font-weight: lighter;
     border: none;
@@ -75,76 +75,8 @@
     border-radius: 5px;
 }
 
-.chat-container {
-    flex: 1;
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-creation-container {
-    position: absolute;
-    top: 40%; /* Center vertically */
-    left: 50%; /* Center horizontally */
-    border: 1px solid #ccc;
-    padding: 20px;
-}
-
-.chat-header {
-    display: flex;
-    justify-content: space-between;
-}
-
-.create-chatroom-header {
-    font-size: 20px;
-    margin-bottom: 10px;
-}
-
-.chat-name {
-    font-weight: bold;
-    font-size: 24px;
-}
-
-.add-user {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 15px;
-    margin-bottom: 5px;
-}
-
-.add-user:hover {
-    cursor: pointer;
-}
-
-.chat-box {
-    flex: 1;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 10px;
-    overflow-y: scroll;
-    margin-bottom: 20px;
-    height: 500px;
-}
-
 .input-container {
     display: flex;
     align-items: center;
-}
-
-input {
-    flex: 1;
-    padding: 8px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    background-color: #007bff;
-    color: white;
-    cursor: pointer;
+    width: 100%;
 }

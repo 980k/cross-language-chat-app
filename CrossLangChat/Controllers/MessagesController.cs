@@ -22,7 +22,7 @@ namespace CrossLangChat.Controllers
         // GET: Messages
         public async Task<IActionResult> Index()
         {
-            var crossLangChatContext = _context.Message.Include(m => m.ChatRoom).Include(m => m.Sender);
+            var crossLangChatContext = _context.Message.Include(m => m.ChatRoom);
             return View(await crossLangChatContext.ToListAsync());
         }
 
@@ -36,7 +36,6 @@ namespace CrossLangChat.Controllers
 
             var message = await _context.Message
                 .Include(m => m.ChatRoom)
-                .Include(m => m.Sender)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (message == null)
             {
@@ -50,27 +49,25 @@ namespace CrossLangChat.Controllers
         public IActionResult Create()
         {
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName");
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language");
             return View();
         }
 
-        // // POST: Messages/Create
-        // // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Create([Bind("Id,Content,Timestamp,SenderId,ChatRoomId")] Message message)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         _context.Add(message);
-        //         await _context.SaveChangesAsync();
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-        //     ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
-        //     return View(message);
-        // }
+        // POST: Messages/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Content,SenderUsername,ChatRoomId")] Message message)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(message);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
+            return View(message);
+        }
 
         // GET: Messages/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -86,7 +83,6 @@ namespace CrossLangChat.Controllers
                 return NotFound();
             }
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
             return View(message);
         }
 
@@ -95,7 +91,7 @@ namespace CrossLangChat.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,Timestamp,SenderId,ChatRoomId")] Message message)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,SenderUsername,ChatRoomId")] Message message)
         {
             if (id != message.Id)
             {
@@ -123,7 +119,6 @@ namespace CrossLangChat.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["ChatRoomId"] = new SelectList(_context.ChatRoom, "Id", "RoomName", message.ChatRoomId);
-            ViewData["SenderId"] = new SelectList(_context.User, "Id", "Language", message.SenderId);
             return View(message);
         }
 
@@ -137,7 +132,6 @@ namespace CrossLangChat.Controllers
 
             var message = await _context.Message
                 .Include(m => m.ChatRoom)
-                .Include(m => m.Sender)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (message == null)
             {
@@ -166,40 +160,46 @@ namespace CrossLangChat.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-        /*
-        ***
-        CUSTOM ROUTES
-        ***
-        */
-
-        // POST: Messages/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateMessage([Bind("Id, SenderId, ChatRoomId, Content")] Message message)
-        {
-            if(ModelState.IsValid)
-            {
-                try 
-                {
-                    _context.Add(message);
-                    await _context.SaveChangesAsync();
-                    return Ok("Successfully created message");
-                }
-                catch
-                {
-                    return StatusCode(500, "An error occurred while processing your request.");
-                }
-            }
-            else
-            {
-                return BadRequest(ModelState);
-            }
-        }
-        
         private bool MessageExists(int id)
         {
           return (_context.Message?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        /********************
+        *** CUSTOM ROUTES ***
+        *********************/
+
+        [HttpPost, ActionName("CreateMessage")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateMessage(int id, string content)
+        {
+            try
+            {
+                var username = HttpContext.Session.GetString("Username"); // Get the username from the session
+
+                var chatRoom = await _context.ChatRoom.FindAsync(id);
+
+                if (username == null || chatRoom == null)
+                {
+                    return NotFound("Not found");
+                }
+
+                var newMessage = new Message
+                {
+                    Content = content,
+                    SenderUsername = username, 
+                    ChatRoomId = chatRoom.Id
+                };
+
+                _context.Add(newMessage);
+                await _context.SaveChangesAsync(); // Save changes to the database
+
+                return RedirectToAction("GetChatRoom", "ChatRooms", new { id = id });
+            }
+            catch
+            {
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
         }
     }
 }

@@ -5,7 +5,7 @@
 namespace CrossLangChat.Migrations
 {
     /// <inheritdoc />
-    public partial class AddMessageRelationships : Migration
+    public partial class UpdatedMessagesScaffold : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

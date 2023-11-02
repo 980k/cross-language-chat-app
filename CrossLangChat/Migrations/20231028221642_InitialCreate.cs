@@ -30,8 +30,9 @@ namespace CrossLangChat.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Username = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false),
-                    Password = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: false)
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    Language = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,11 +44,11 @@ namespace CrossLangChat.Migrations
                 columns: table => new
                 {
                     ChatRoomsId = table.Column<int>(type: "integer", nullable: false),
-                    ParticipantsId = table.Column<int>(type: "integer", nullable: false)
+                    UsersId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ChatRoomUser", x => new { x.ChatRoomsId, x.ParticipantsId });
+                    table.PrimaryKey("PK_ChatRoomUser", x => new { x.ChatRoomsId, x.UsersId });
                     table.ForeignKey(
                         name: "FK_ChatRoomUser_ChatRoom_ChatRoomsId",
                         column: x => x.ChatRoomsId,
@@ -55,8 +56,8 @@ namespace CrossLangChat.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChatRoomUser_User_ParticipantsId",
-                        column: x => x.ParticipantsId,
+                        name: "FK_ChatRoomUser_User_UsersId",
+                        column: x => x.UsersId,
                         principalTable: "User",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -69,8 +70,8 @@ namespace CrossLangChat.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Content = table.Column<string>(type: "text", nullable: false),
-                    SenderId = table.Column<int>(type: "integer", nullable: false),
-                    ChatRoomId = table.Column<int>(type: "integer", nullable: false)
+                    SenderId = table.Column<int>(type: "integer", nullable: true),
+                    ChatRoomId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -79,20 +80,18 @@ namespace CrossLangChat.Migrations
                         name: "FK_Message_ChatRoom_ChatRoomId",
                         column: x => x.ChatRoomId,
                         principalTable: "ChatRoom",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Message_User_SenderId",
                         column: x => x.SenderId,
                         principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChatRoomUser_ParticipantsId",
+                name: "IX_ChatRoomUser_UsersId",
                 table: "ChatRoomUser",
-                column: "ParticipantsId");
+                column: "UsersId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Message_ChatRoomId",

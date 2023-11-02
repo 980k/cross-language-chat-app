@@ -18,22 +18,16 @@
             @Html.DisplayFor(model => model.Content)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Timestamp)
+            @Html.DisplayNameFor(model => model.SenderUsername)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Timestamp)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sender)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sender.Language)
+            @Html.DisplayFor(model => model.SenderUsername)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ChatRoom)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ChatRoom.RoomName)
+            @Html.DisplayFor(model => model.ChatRoom!.RoomName)
         </dd>
     </dl>
     

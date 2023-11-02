@@ -5,22 +5,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
 using CrossLangChat.Data;
 using CrossLangChat.Models;
-using NuGet.Versioning;
+using CrossLangChat.Services;
+using NuGet.Packaging;
 
 namespace CrossLangChat.Controllers
 {
     public class ChatRoomsController : Controller
     {
         private readonly CrossLangChatContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public ChatRoomsController(CrossLangChatContext context,  IHttpContextAccessor httpContextAccessor )
+        private readonly DeepLTranslationService _translationService;
+
+
+        public ChatRoomsController(CrossLangChatContext context, DeepLTranslationService translationService)
         {
             _context = context;
-            _httpContextAccessor = httpContextAccessor;
+            _translationService = translationService;
+
         }
 
         // GET: ChatRooms
@@ -49,43 +52,43 @@ namespace CrossLangChat.Controllers
             return View(chatRoom);
         }
 
-        // // GET: ChatRooms/Create
-        // public IActionResult Create()
-        // {
-        //     return View();
-        // }
+        // GET: ChatRooms/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
 
-        // // POST: ChatRooms/Create
-        // // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Create([Bind("Id,RoomName")] ChatRoom chatRoom)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         _context.Add(chatRoom);
-        //         await _context.SaveChangesAsync();
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     return View(chatRoom);
-        // }
+        // POST: ChatRooms/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,RoomName")] ChatRoom chatRoom)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(chatRoom);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(chatRoom);
+        }
 
-        // // GET: ChatRooms/Edit/5
-        // public async Task<IActionResult> Edit(int? id)
-        // {
-        //     if (id == null || _context.ChatRoom == null)
-        //     {
-        //         return NotFound();
-        //     }
+        // GET: ChatRooms/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null || _context.ChatRoom == null)
+            {
+                return NotFound();
+            }
 
-        //     var chatRoom = await _context.ChatRoom.FindAsync(id);
-        //     if (chatRoom == null)
-        //     {
-        //         return NotFound();
-        //     }
-        //     return View(chatRoom);
-        // }
+            var chatRoom = await _context.ChatRoom.FindAsync(id);
+            if (chatRoom == null)
+            {
+                return NotFound();
+            }
+            return View(chatRoom);
+        }
 
         // POST: ChatRooms/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -140,72 +143,73 @@ namespace CrossLangChat.Controllers
             return View(chatRoom);
         }
 
-        // // POST: ChatRooms/Delete/5
-        // [HttpPost, ActionName("Delete")]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> DeleteConfirmed(int id)
-        // {
-        //     if (_context.ChatRoom == null)
-        //     {
-        //         return Problem("Entity set 'CrossLangChatContext.ChatRoom'  is null.");
-        //     }
-        //     var chatRoom = await _context.ChatRoom.FindAsync(id);
-        //     if (chatRoom != null)
-        //     {
-        //         _context.ChatRoom.Remove(chatRoom);
-        //     }
+        // POST: ChatRooms/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            if (_context.ChatRoom == null)
+            {
+                return Problem("Entity set 'CrossLangChatContext.ChatRoom'  is null.");
+            }
+            var chatRoom = await _context.ChatRoom.FindAsync(id);
+            if (chatRoom != null)
+            {
+                _context.ChatRoom.Remove(chatRoom);
+            }
             
-        //     await _context.SaveChangesAsync();
-        //     return RedirectToAction(nameof(Index));
-        // }
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
+        private bool ChatRoomExists(int id)
+        {
+          return (_context.ChatRoom?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
 
-        //         public async Task<IActionResult> Create([Bind("Id,RoomName")] ChatRoom chatRoom)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         _context.Add(chatRoom);
-        //         await _context.SaveChangesAsync();
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     return View(chatRoom);
-        // }
-
-
-        /*
-        ***
-        CUSTOM ROUTES
-        ***
-        */
+        /********************
+        *** CUSTOM ROUTES ***
+        *********************/
 
         // GET: ChatRooms/{Id}
-        [HttpGet, ActionName("Get")]
+        [HttpGet, ActionName("GetChatRoom")]
         public async Task<IActionResult> GetChatRoom(int? id) 
         {
-            var Id = HttpContext.Session.GetInt32("Id");
-            var Username = HttpContext.Session.GetString("Username");
+            var userId = HttpContext.Session.GetInt32("Id");
+            var username = HttpContext.Session.GetString("Username");
 
-            if(Id == null || Username == null)
+            if(userId == null || username == null)
             {
                 return RedirectToAction("Login", "Accounts");
             }
 
             var user = await _context.User
                 .Include(u => u.ChatRooms)
-                .FirstOrDefaultAsync(u => u.Id == Id);
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
-            if (user != null)
+            var chatRoom = await _context.ChatRoom
+                .Include(c => c.Messages)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            List<string> translatedMessages = new List<string>();
+
+            if(chatRoom!.Messages!.Count > 0){
+                var originalMessages = chatRoom!.Messages!.Select(m => m.Content).ToList();
+
+                 string[] nonNullableOriginalMessages = originalMessages
+                    .Where(message => message != null)
+                    .Select(message => message!)
+                    .ToArray();
+
+                translatedMessages = await _translationService.TranslateAsync(nonNullableOriginalMessages, user!.Language!);
+            }
+
+            if (user != null && chatRoom != null)
             {
                 var chatRooms = user.ChatRooms.ToList();
-
-                ViewData["ChatRooms"] = chatRooms;
-
-                var chatRoom = chatRooms.Find(c => c.Id == id);
-
-                if(chatRoom != null) 
-                {
-                    return View("Chat", chatRoom);
-                }
+                ViewData["ChatRooms"] = chatRooms; 
+                ViewData["Translations"] = translatedMessages;
+                return View("ChatRoom", chatRoom);
             }
 
             return NotFound("Chat room not found.");
@@ -252,7 +256,7 @@ namespace CrossLangChat.Controllers
         }
 
         // POST: ChatRooms/Delete/{Id}
-        [HttpPost, ActionName("Delete")]
+        [HttpPost, ActionName("DeleteChatRoom")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteChatRoom(int id)
         {
@@ -289,13 +293,14 @@ namespace CrossLangChat.Controllers
             }
         }
 
-        [HttpPost("ChatRooms/User/{userId}/Edit/{Id}")]
+        // POST: ChatRooms/AddUser
+        [HttpPost, ActionName("AddUser")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditChatRoomAddUser(int userId, int Id) 
+        public async Task<IActionResult> EditChatRoomAddUser(string username, int Id) 
         {
             try 
             {
-                var user = await _context.User.FindAsync(userId);
+                var user = await _context.User.FirstOrDefaultAsync(u => u.Username == username);
                 var chatRoom = await _context.ChatRoom.FindAsync(Id);
 
                 if (user == null || chatRoom == null) 
@@ -310,17 +315,12 @@ namespace CrossLangChat.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return Ok("User added to chat room");
+                return RedirectToAction("Index", "Home");
             }
             catch 
             {
                 return StatusCode(500, "An error occurred while processing your request.");
             }
-        }
-
-        private bool ChatRoomExists(int id)
-        {
-          return (_context.ChatRoom?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

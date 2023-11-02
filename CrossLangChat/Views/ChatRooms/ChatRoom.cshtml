@@ -1,0 +1,111 @@
+@model CrossLangChat.Models.ChatRoom
+
+@{
+    ViewData["Title"] = Model.RoomName;
+    var chatRooms = ViewData["ChatRooms"] as List<ChatRoom>;
+    var translations = ViewData["Translations"] as List<string>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+    <title>@ViewData["Title"]</title>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <a asp-action="Create" asp-controller="ChatRooms" class="add-chat-button">+ New Chat</a>
+            <div class="users-list">
+                @if (chatRooms != null)
+                {
+                    foreach (var chatRoom in chatRooms)
+                    {
+                        <div class="user">
+                            <a asp-action="GetChatRoom" asp-controller="ChatRooms" asp-route-id="@chatRoom.Id"
+                                class="chat-room-name">@chatRoom.RoomName</a>
+                            <form asp-action="DeleteChatRoom" asp-controller="ChatRooms" asp-route-id="@chatRoom.Id"
+                                method="post">
+                                <button type="submit" class="delete-chat-button">X</button>
+                            </form>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="chat-container">
+            <div class="chat-header-container">
+                <div class="chat-header-name">@Model.RoomName</div>
+                <div class="add-user-button" id="add-user-button">+ Add User</div>
+
+                <form id="user-add-form" asp-action="AddUser" asp-controller="ChatRooms" method="post"
+                    style="display: none;">
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="add-form-group">
+                        <label for="userId">Username:</label>
+                        <input type="text" id="username" name="username" class="form-control" required />
+                    </div>
+
+                    <button type="submit" class="add-user-submit">Add User</button>
+                </form>
+            </div>
+            <div class="chat-box-container" id="chat-box">
+                @if (Model != null && Model.Messages != null && translations != null)
+                {
+                    var messagesList = Model.Messages.ToList(); // Convert to a List<Message>
+                    
+                    for (int i = 0; i < messagesList.Count && i < translations.Count; i++)
+                    {
+                        var message = messagesList[i];
+                        var translation = translations[i];
+
+                        <div class="message">
+                            <strong>@message.SenderUsername:</strong> @message.Content
+                        </div>
+
+                        if(message.Content != translation)
+                        {
+                            <div class="translation">
+                                @translation
+                            </div>                        
+                        } 
+
+                    }
+                }
+            </div>
+            <div class="input-container">
+                <form id="send-message-form" method="post" asp-controller="Messages" asp-action="CreateMessage"
+                    asp-route-id="@Model?.Id">
+                    <div class="form-group">
+                        @* <textarea class="form-control" id="content" name="content" rows="3" required></textarea> *@
+                        <input type="text" id="content" name="content" class="type-message-input"
+                            placeholder="Type your message...">
+                    </div>
+                    <button type="submit" class="send-message-button">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var addUserButton = document.getElementById("add-user-button");
+        var userForm = document.getElementById("user-add-form");
+
+        // Add a click event listener to the button
+        addUserButton.addEventListener("click", function () {
+            // Hide the button
+            addUserButton.style.display = "none";
+
+            // Show the form
+            userForm.style.display = "block";
+        });
+    </script>
+</body>
+
+</html>

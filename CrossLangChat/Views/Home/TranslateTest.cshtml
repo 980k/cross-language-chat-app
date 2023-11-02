@@ -1,0 +1,24 @@
+@model CrossLangChat.ViewModels.TranslationViewModel
+
+<form method="post">
+    <div>
+        <label for="text">Text to Translate:</label>
+        <input type="text" id="text" name="Text" value="@Model.Text" required />
+    </div>
+    <div>
+        <label for="targetLanguage">Target Language:</label>
+        <input type="text" id="targetLanguage" name="TargetLanguage" value="@Model.TargetLanguage" required />
+    </div>
+    <button type="submit">Translate</button>
+</form>
+
+@if (Model.TranslatedTexts != null && Model.TranslatedTexts.Any())
+{
+    <h2>Translated Text:</h2>
+    <ul>
+        @foreach (var translatedText in Model.TranslatedTexts)
+        {
+            <li>@translatedText</li>
+        }
+    </ul>
+}
