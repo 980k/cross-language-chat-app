@@ -4,22 +4,24 @@
 A powerful multilingual messaging app that brings people together across language barriers. Users can chat seamlessly in their native languages, with real-time translations. It’s like having a personal language interpreter right in your pocket! 🌐🗣️💬🔥
 
 ## Technologies
-**Framework:**
-- ASP.NET
 
-**Frontend:**
-- HTML
-- CSS
-- JavaScript
+### Framework
+- **ASP.NET**
 
-**Backend:**
-- C#
-- PostgreSQL
+### Frontend
+- **HTML**
+- **CSS**
+- **JavaScript**
 
-**External API:**
-- DeepL Translate API
+### Backend
+- **C#**
+- **PostgreSQL**
+
+### External API
+- **DeepL Translate API**
 
 ## Methodology
+
 ### Framework
 - **ASP.NET**
     - ASP.NET defined the Model-View-Controller (MVC) design pattern for the entirety of the application.
@@ -28,7 +30,7 @@ A powerful multilingual messaging app that brings people together across languag
     - Controllers handled user input, such as sending messages, by passing data through forms and processing them through the RESTful API.
 
 ### Frontend
-- **HTML and CSS**
+- **HTML**
     - HTML and CSS form the foundation for the user interface and visual components.
     - The login page, landing page, and various forms were developed using HTML.
     - CSS was used to style these components, ensuring a cohesive and visually appealing design.
