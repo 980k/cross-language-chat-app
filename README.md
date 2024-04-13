@@ -3,8 +3,13 @@
 ## Description
 A powerful multilingual messaging app that brings people together across language barriers. Users can chat seamlessly in their native languages, with real-time translations. It’s like having a personal language interpreter right in your pocket! 🌐🗣️💬🔥
 
-## Technologies
+## Features
+- **User creation and login**: Users are able to create simple accounts with a username and a password. There is basic authentication that checks if the username and password are valid before allowing application usage.
+- **Chat room management**: Users can create and delete chat rooms. There is a left sidebar that allows users to manage all of their active chat rooms.
+- **Adding users to chat rooms**: Users that create their own chat rooms can add as many other users to their chat rooms and receive messages from one another.
+- **Language translations**: Messages can be sent in the users' native languages.  They will be translated to the receiving users' native languages.
 
+## Technologies
 ### Framework
 - **ASP.NET**
 
