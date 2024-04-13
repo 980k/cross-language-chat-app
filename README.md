@@ -14,19 +14,15 @@ A powerful multilingual messaging app that brings people together across languag
 - **ASP.NET**
 
 ### Frontend
-- **HTML**
-- **CSS**
-- **JavaScript**
+- **HTML**, **CSS**, **JavaScript**
 
 ### Backend
-- **C#**
-- **PostgreSQL**
+- **C#**, **PostgreSQL**
 
 ### External API
 - **DeepL Translate API**
 
 ## Methodology
-
 ### Framework
 - **ASP.NET**
     - ASP.NET defined the Model-View-Controller (MVC) design pattern for the entirety of the application.
